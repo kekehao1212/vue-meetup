@@ -1,37 +1,37 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import * as firebase from 'firebase'
+import * as wilddog from 'wilddog'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     loadedMeetups: [
-      { imageUrl: 'http://www.hotel-discount.com/wp-content/uploads/New_york_times_square-terabass.jpg',
+      {
+        imageUrl: 'http://www.hotel-discount.com/wp-content/uploads/New_york_times_square-terabass.jpg',
         title: 'one hello hello hello hello',
         id: 'jfldskajflk1',
         date: new Date(),
         description: 'Awesome',
         location: 'New York'
       },
-      { imageUrl: 'http://static3.businessinsider.com/image/587502c0f10a9ac1348b74b7-1190-625/7-billion-dollar-mega-projects-that-will-transform-new-york-city-by-2035.jpg',
+      {
+        imageUrl: 'http://static3.businessinsider.com/image/587502c0f10a9ac1348b74b7-1190-625/7-billion-dollar-mega-projects-that-will-transform-new-york-city-by-2035.jpg',
         title: 'two',
         id: 'adfdg',
         date: new Date(),
         description: 'Awesome',
         location: 'Paris'
       },
-      { imageUrl: 'https://cdn.getyourguide.com/niwziy2l9cvz/5ufV8PnNLOosmaaO2Soq6U/276e23f2fd5fdf51113178ec8a93d12b/NewYork-911_memorial_and_museum-1500x850.JPG',
+      {
+        imageUrl: 'https://cdn.getyourguide.com/niwziy2l9cvz/5ufV8PnNLOosmaaO2Soq6U/276e23f2fd5fdf51113178ec8a93d12b/NewYork-911_memorial_and_museum-1500x850.JPG',
         title: 'three',
         id: 'pohkgphk2434',
         date: new Date(),
         description: 'Awesome',
         location: 'London'
-      }]
-  },
-  user: {
-    id: 'oijdfjdklf',
-    registerMeetup: ['sadfsfdfdsaa']
+      }],
+    user: null
   },
   mutations: {
     createMeetup (state, payload) {
@@ -55,20 +55,28 @@ export default new Vuex.Store({
       commit('createMeetup', meetup)
     },
     signUserUp ({commit}, payload) {
-      firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            const newUser = {
-              id: user.uid,
-              registeredMeetup: []
-            }
-            commit('setUser', newUser)
+      wilddog.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+        .then((user) => {
+          const newUser = {
+            id: user.uid,
+            registerMeetup: []
           }
-        ).catch(
-          error => {
-            console.log(error)
+          commit('setUser', newUser)
+        }).catch((error) => {
+          console.log(error)
+        })
+    },
+    signUserIn ({commit}, payload) {
+      wilddog.auth().signInWithEmailAndPassword(payload.email, payload.password)
+        .then((user) => {
+          const newUser = {
+            id: user.uid,
+            registerMeetup: []
           }
-      )
+          commit('setUser', newUser)
+        }).catch((error) => {
+          console.log(error)
+        })
     }
   },
   getters: {
@@ -85,7 +93,12 @@ export default new Vuex.Store({
       }
     },
     featuredMeetups (state, getters) {
-      return getters.loadedMeetups(state).slice(0, 5)
+      return state.loadedMeetups.sort((meetupA, meetupB) => {
+        return meetupA.date > meetupB.date
+      }).slice(0, 5)
+    },
+    user (state) {
+      return state.user
     }
   }
 })

@@ -52,13 +52,26 @@
   export default {
     data () {
       return {
-        sideNav: false,
-        menuItems: [
-          {icon: 'payment', title: 'Create Meetup', link: '/Meetup/new'},
-          {icon: 'person', title: 'Meet up', link: '/Meetups'},
+        sideNav: false
+      }
+    },
+    computed: {
+      menuItems () {
+        let menuItems = [
           {icon: 'donut_large', title: 'Sign in', link: '/Signin'},
           {icon: 'face', title: 'Sign up', link: '/Signup'}
         ]
+        if (this.userIsAuthenticated) {
+          menuItems = [
+            {icon: 'payment', title: 'Create Meetup', link: '/Meetup/new'},
+            {icon: 'person', title: 'Meet up', link: '/Meetups'},
+            {icon: 'supervisor_account', title: 'Profile', link: '/Profile'}
+          ]
+        }
+        return menuItems
+      },
+      userIsAuthenticated () {
+        return this.$store.getters.user !== null && this.$store.getters.user !== undefined
       }
     }
   }
