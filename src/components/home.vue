@@ -19,10 +19,21 @@
         </v-btn>
       </v-flex>
     </v-layout>
-    <v-layout row wrap>
+    <v-layout row>
+      <v-flex xs12 class="text-xs-center">
+        <v-progress-circular
+          indeterminate
+          v-bind:size="100"
+          class="red--text mt-5"
+          :width="6"
+          v-if="loading"
+        ></v-progress-circular>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap v-if="!loading">
       <v-flex xs12 md10 offset-md1>
         <template>
-          <v-carousel style="cursor : pointer">
+          <v-carousel style="cursor : pointer" class="mt-4">
             <v-carousel-item
               v-for="meetup in meetups"
               :key="meetup.title"
@@ -45,6 +56,9 @@
     computed: {
       meetups () {
         return this.$store.getters.loadedMeetups
+      },
+      loading () {
+        return this.$store.getters.loading
       }
     },
     data () {

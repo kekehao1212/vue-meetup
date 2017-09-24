@@ -1,5 +1,10 @@
 <template>
   <v-container>
+    <v-layout row v-if="error">
+      <v-flex xs12 sm6 offset-sm3>
+        <app-alert @dismissed="onDismissed" :text="error.message"></app-alert>
+      </v-flex>
+    </v-layout>
     <v-layout>
       <v-flex xs12 sm6 offset-sm3>
         <v-card>
@@ -16,7 +21,6 @@
                       type="email"
                       required>
                     </v-text-field>
-                    {{email}}
                   </v-flex>
                 </v-layout>
                 <v-layout row>
@@ -29,12 +33,15 @@
                       type="password"
                       required>
                     </v-text-field>
-                    {{password}}
                   </v-flex>
                 </v-layout>
                 <v-layout>
                   <v-flex xs12>
-                    <v-btn @click="onSignin">Sign in</v-btn>
+                    <v-btn
+                      @click="onSignin"
+                      :loading="loading"
+                      :disabled="loading"
+                    >Sign in</v-btn>
                   </v-flex>
                 </v-layout>
               </form>
@@ -57,6 +64,12 @@
     computed: {
       user () {
         return this.$store.getters.user
+      },
+      loading () {
+        return this.$store.getters.loading
+      },
+      error () {
+        return this.$store.getters.error
       }
     },
     watch: {
@@ -69,6 +82,9 @@
     methods: {
       onSignin () {
         this.$store.dispatch('signUserIn', {email: this.email, password: this.password})
+      },
+      onDismissed () {
+        this.$store.dispatch('clearError')
       }
     }
   }

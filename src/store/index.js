@@ -31,30 +31,76 @@ export default new Vuex.Store({
         description: 'Awesome',
         location: 'London'
       }],
-    user: null
+    user: null,
+    loading: false,
+    error: null
   },
   mutations: {
+    loadMeetups (state, payload) {
+      state.loadedMeetups = payload
+    },
     createMeetup (state, payload) {
       state.loadedMeetups.push(payload)
-      console.log(state.loadedMeetups)
     },
     setUser (state, payload) {
       state.user = payload
+    },
+    setLoading (state, payload) {
+      state.loading = payload
+    },
+    setError (state, payload) {
+      state.error = payload
+    },
+    clearError (state) {
+      state.error = null
     }
   },
   actions: {
+    loadMeetups ({commit}) {
+      commit('setLoading', true)
+      wilddog.sync().ref('meetups').once('value')
+        .then((data) => {
+          const meetups = []
+          const obj = data.val()
+          for (let key in obj) {
+            meetups.push({
+              id: key,
+              title: obj[key].title,
+              location: obj[key].location,
+              imageUrl: obj[key].imageUrl,
+              description: obj[key].description,
+              date: obj[key].date
+            })
+          }
+          commit('loadMeetups', meetups)
+          commit('setLoading', false)
+        }).catch((error) => {
+          console.log(error)
+          commit('setLoading', false)
+        })
+    },
     createMeetup ({commit}, payload) {
       const meetup = {
         title: payload.title,
         location: payload.location,
         imageUrl: payload.imageUrl,
         description: payload.description,
-        date: payload.date,
-        id: 'gjiofjlksdjf;'
+        date: payload.date.toISOString()
       }
-      commit('createMeetup', meetup)
+      wilddog.sync().ref('meetups').push(meetup)
+        .then((data) => {
+          const key = data.key().slice(1, data.key().length)
+          commit('createMeetup', {
+            ...meetup,
+            id: key
+          })
+        }).catch((error) => {
+          console.log(error)
+        })
     },
     signUserUp ({commit}, payload) {
+      commit('setLoading', true)
+      commit('clearError')
       wilddog.auth().createUserWithEmailAndPassword(payload.email, payload.password)
         .then((user) => {
           const newUser = {
@@ -62,11 +108,16 @@ export default new Vuex.Store({
             registerMeetup: []
           }
           commit('setUser', newUser)
+          commit('setLoading', false)
         }).catch((error) => {
           console.log(error)
+          commit('setLoading', false)
+          commit('setError', error)
         })
     },
     signUserIn ({commit}, payload) {
+      commit('setLoading', true)
+      commit('clearError')
       wilddog.auth().signInWithEmailAndPassword(payload.email, payload.password)
         .then((user) => {
           const newUser = {
@@ -74,9 +125,15 @@ export default new Vuex.Store({
             registerMeetup: []
           }
           commit('setUser', newUser)
+          commit('setLoading', false)
         }).catch((error) => {
           console.log(error)
+          commit('setLoading', false)
+          commit('setError', error)
         })
+    },
+    clearError ({commit}) {
+      commit('clearError')
     }
   },
   getters: {
@@ -99,6 +156,12 @@ export default new Vuex.Store({
     },
     user (state) {
       return state.user
+    },
+    error (state) {
+      return state.error
+    },
+    loading (state) {
+      return state.loading
     }
   }
 })
