@@ -25,7 +25,7 @@
           indeterminate
           v-bind:size="100"
           class="red--text mt-5"
-          :width="6"
+          :width="4"
           v-if="loading"
         ></v-progress-circular>
       </v-flex>

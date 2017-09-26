@@ -25,6 +25,11 @@ new Vue({
       authDomain: 'wd1793780581mqwydb.wilddog.com',
       syncURL: 'https://wd1793780581mqwydb.wilddogio.com'
     })
+    wilddog.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.$store.dispatch('autoSignIn', user)
+      }
+    })
     this.$store.dispatch('loadMeetups')
   }
 })
