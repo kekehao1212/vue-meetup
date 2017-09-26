@@ -6,12 +6,14 @@ import router from './router'
 import store from './store'
 import DateFilter from './filters/date'
 import * as wilddog from 'wilddog'
-import SignError from './components/shared/SignError.vue'
+import SignError from '@/components/shared/SignError.vue'
+import EditMeetupDetailsDialog from './components/Meetup/Edit/EditMeetupDetailsDialog.vue'
 
 Vue.use(Vuetify)
 Vue.config.productionTip = false
 Vue.filter('date', DateFilter)
 Vue.component('app-alert', SignError)
+Vue.component('edit-meetup-detail', EditMeetupDetailsDialog)
 
 /* eslint-disable no-new */
 new Vue({

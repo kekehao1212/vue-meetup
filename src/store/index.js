@@ -42,6 +42,20 @@ export default new Vuex.Store({
     createMeetup (state, payload) {
       state.loadedMeetups.push(payload)
     },
+    updateMeetup (state, payload) {
+      const meetup = state.loadedMeetups.find((meetup) => {
+        return payload.id === meetup.id
+      })
+      if (payload.title) {
+        meetup.title = payload.title
+      }
+      if (payload.description) {
+        meetup.description = payload.description
+      }
+      if (payload.date) {
+        meetup.date = payload.date
+      }
+    },
     setUser (state, payload) {
       state.user = payload
     },
@@ -70,12 +84,34 @@ export default new Vuex.Store({
               imageUrl: obj[key].imageUrl,
               description: obj[key].description,
               date: obj[key].date,
-              creatorId: obj[key].id
+              creatorId: obj[key].creatorId
             })
           }
           commit('loadMeetups', meetups)
           commit('setLoading', false)
         }).catch((error) => {
+          console.log(error)
+          commit('setLoading', false)
+        })
+    },
+    updateMeetupData ({commit}, payload) {
+      commit('setLoading', true)
+      const updateObj = {}
+      if (payload.title) {
+        updateObj.title = payload.title
+      }
+      if (payload.description) {
+        updateObj.description = payload.description
+      }
+      if (payload.date) {
+        updateObj.date = payload.date
+      }
+      wilddog.sync().ref('meetups').child(payload.id).update(updateObj)
+        .then(() => {
+          commit('updateMeetup', payload)
+          commit('setLoading', false)
+        })
+        .catch((error) => {
           console.log(error)
           commit('setLoading', false)
         })

@@ -19,14 +19,13 @@
         </v-btn>
       </v-flex>
     </v-layout>
-    <v-layout row>
+    <v-layout row v-if="loading">
       <v-flex xs12 class="text-xs-center">
         <v-progress-circular
           indeterminate
           v-bind:size="100"
           class="red--text mt-5"
           :width="4"
-          v-if="loading"
         ></v-progress-circular>
       </v-flex>
     </v-layout>
