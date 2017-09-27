@@ -27,7 +27,11 @@
           </v-card-media>
           <v-card-text>
             <h6 class="info--text">{{meetup.date | date}} - {{meetup.location}}</h6>
-            {{meetup.description}}
+            <div>
+              <edit-meetup-date :meetup="meetup"></edit-meetup-date>
+              <edit-meetup-time :meetup="meetup"></edit-meetup-time>
+            </div>
+            <div>{{meetup.description}}</div>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -51,8 +55,6 @@
         return this.$store.getters.user !== undefined && this.$store.getters.user !== null
       },
       userIsCreator () {
-        console.log(this.$store.getters.user.id)
-        console.log(this.meetup.creatorId)
         if (!this.userIsAuthenticated) {
           return false
         } else {
