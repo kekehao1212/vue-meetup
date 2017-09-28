@@ -36,6 +36,21 @@ export default new Vuex.Store({
     error: null
   },
   mutations: {
+    registerUserForMeetup (state, payload) {
+      const id = payload.id
+      if (state.user.registeredMeetup.findIndex(meetup => meetup.id === id) >= 0) {
+        return
+      }
+      state.user.registeredMeetup.push(id)
+      state.user.wdkeys[id] = payload.wdkeys
+    },
+    unregisterUserFromMeetup (state, payload) {
+      const registeredMeetup = state.user.registeredMeetup
+      registeredMeetup.splice(registeredMeetup.findIndex(meetup => {
+        return meetup.id === payload
+      }), 1)
+      Reflect.deleteProperty(state.user.wdkeys, payload)
+    },
     loadMeetups (state, payload) {
       state.loadedMeetups = payload
     },
@@ -70,6 +85,37 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    registerUserForMeetup ({commit, getters}, payload) {
+      commit('setLoading', true)
+      const user = getters.user
+      wilddog.sync().ref('/users/' + user.id).child('/registrations/').push(payload)
+        .then((data) => {
+          commit('setLoading', false)
+          commit('registerUserForMeetup', {id: payload, wdkeys: data.key()})
+        })
+        .catch((error) => {
+          commit('setLoading', false)
+          commit('setError', error)
+        })
+    },
+    unregisterUserFromMeetup ({commit, getters}, payload) {
+      commit('setLoading', true)
+      const user = getters.user
+      if (!user.wdkeys) {
+        return
+      }
+      const wdkeys = user.wdkeys[payload]
+      wilddog.sync().ref('/users/' + user.id + '/registrations/' + wdkeys).remove()
+        .then(() => {
+          commit('setLoading', false)
+          commit('unregisterUserFromMeetup', payload)
+        })
+        .catch((error) => {
+          commit('setLoading', false)
+          console.log(error)
+          commit('setError', error)
+        })
+    },
     loadMeetups ({commit}) {
       commit('setLoading', true)
       wilddog.sync().ref('meetups').once('value')
@@ -127,7 +173,7 @@ export default new Vuex.Store({
       }
       wilddog.sync().ref('meetups').push(meetup)
         .then((data) => {
-          const key = data.key().slice(1, data.key().length)
+          const key = data.key()
           commit('createMeetup', {
             ...meetup,
             id: key
@@ -143,7 +189,8 @@ export default new Vuex.Store({
         .then((user) => {
           const newUser = {
             id: user.uid,
-            registerMeetup: []
+            registeredMeetup: [],
+            wdkey: {}
           }
           commit('setUser', newUser)
           commit('setLoading', false)
@@ -160,7 +207,8 @@ export default new Vuex.Store({
         .then((user) => {
           const newUser = {
             id: user.uid,
-            registerMeetup: []
+            registerMeetup: [],
+            wdkeys: {}
           }
           commit('setUser', newUser)
           commit('setLoading', false)
@@ -174,7 +222,7 @@ export default new Vuex.Store({
       commit('clearError')
     },
     autoSignIn ({commit}, payload) {
-      commit('setUser', { id: payload.uid, registerMeetup: [] })
+      commit('setUser', { id: payload.uid, registeredMeetup: [], wdkeys: {} })
     },
     logout ({commit}) {
       wilddog.auth().signOut()

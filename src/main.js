@@ -10,6 +10,7 @@ import SignError from '@/components/shared/SignError.vue'
 import EditMeetupDetailsDialog from './components/Meetup/Edit/EditMeetupDetailsDialog.vue'
 import EditMeetupDateDialog from './components/Meetup/Edit/EditMeetupDateDialog.vue'
 import EditMeetupTimeDialog from './components/Meetup/Edit/EditMeetupTimeDialog.vue'
+import RegisterDialog from './components/Meetup/Registration/RegisterDialog.vue'
 
 Vue.use(Vuetify)
 Vue.config.productionTip = false
@@ -18,6 +19,7 @@ Vue.component('app-alert', SignError)
 Vue.component('edit-meetup-detail', EditMeetupDetailsDialog)
 Vue.component('edit-meetup-date', EditMeetupDateDialog)
 Vue.component('edit-meetup-time', EditMeetupTimeDialog)
+Vue.component('register-meetup', RegisterDialog)
 
 /* eslint-disable no-new */
 new Vue({
