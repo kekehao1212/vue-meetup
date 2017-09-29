@@ -40,7 +40,7 @@
     },
     computed: {
       userIsRegistered () {
-        return (this.$store.getters.user.registeredMeetup.findIndex((meetupId, index) => {
+        return (this.$store.getters.user.registeredMeetups.findIndex((meetupId, index) => {
           return meetupId === this.meetupId
         }) >= 0)
       }
