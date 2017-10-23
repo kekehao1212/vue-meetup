@@ -60,43 +60,78 @@ export default {
     signUserUp ({commit}, payload) {
       commit('setLoading', true)
       commit('clearError')
-      wilddog.auth().createUserWithEmailAndPassword(payload.email, payload.password)
-        .then((user) => {
-          const newUser = {
-            id: user.uid,
-            registeredMeetups: [],
-            wdkeys: {}
-          }
-          commit('setUser', newUser)
-          commit('setLoading', false)
-        }).catch((error) => {
-          console.log(error)
-          commit('setLoading', false)
-          commit('setError', error)
-        })
+      if (payload.emailSignUp) {
+        wilddog.auth().createUserWithEmailAndPassword(payload.email, payload.password)
+          .then((user) => {
+            const newUser = {
+              id: user.uid,
+              registeredMeetups: [],
+              wdkeys: {}
+            }
+            commit('setUser', newUser)
+            commit('setLoading', false)
+          }).catch((error) => {
+            console.log(error)
+            commit('setLoading', false)
+            commit('setError', error)
+          })
+      } else {
+        wilddog.auth().createUserWithPhoneAndPassword(payload.phoneNumber, payload.password)
+          .then((user) => {
+            const newUser = {
+              id: user.uid,
+              registeredMeetups: [],
+              wdkeys: {}
+            }
+            commit('setUser', newUser)
+            commit('setLoading', false)
+          }).catch((error) => {
+            console.log(error)
+            commit('setLoading', false)
+            commit('setError', error)
+          })
+      }
     },
     signUserIn ({commit}, payload) {
       commit('setLoading', true)
       commit('clearError')
-      wilddog.auth().signInWithEmailAndPassword(payload.email, payload.password)
-        .then((user) => {
-          const newUser = {
-            id: user.uid,
-            registeredMeetups: [],
-            wdkeys: {}
-          }
-          commit('setUser', newUser)
-          commit('setLoading', false)
-        }).catch((error) => {
-          console.log(error)
-          commit('setLoading', false)
-          commit('setError', error)
-        })
+      if (payload.emailSignIn) {
+        wilddog.auth().signInWithEmailAndPassword(payload.email, payload.password)
+          .then((user) => {
+            const newUser = {
+              id: user.uid,
+              registeredMeetups: [],
+              wdkeys: {}
+            }
+            commit('setUser', newUser)
+            commit('setLoading', false)
+          }).catch((error) => {
+            console.log(error)
+            commit('setLoading', false)
+            commit('setError', error)
+          })
+      } else {
+        wilddog.auth().signInWithPhoneAndPassword(payload.phoneNumber, payload.password)
+          .then((user) => {
+            const newUser = {
+              id: user.uid,
+              registerUserForMeetup: [],
+              wdkeys: {}
+            }
+            commit('setUser', newUser)
+            commit('setLoading', false)
+          }).catch((error) => {
+            console.log(error)
+            commit('setLoading', false)
+            commit('setError', error)
+          })
+      }
     },
     autoSignIn ({commit}, payload) {
       commit('setUser', { id: payload.uid, registeredMeetups: [], wdkeys: {} })
     },
     fetchUserData ({commit, getters}) {
+      console.log('fetch' + '/users/' + getters.user.id)
       commit('setLoading', true)
       wilddog.sync().ref('/users/' + getters.user.id + '/registrations/').once('value')
         .then(data => {
@@ -118,6 +153,7 @@ export default {
         .catch(error => {
           commit('setLoading', false)
           commit('setError', error)
+          console.log(error)
         })
     },
     logout ({commit}) {

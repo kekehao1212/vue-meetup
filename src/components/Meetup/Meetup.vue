@@ -26,15 +26,17 @@
           >
           </v-card-media>
           <v-card-text>
-            <h6 class="info--text">{{meetup.date | date}} - {{meetup.location}}</h6>
-            <div v-if="userIsCreator">
-              <edit-meetup-date :meetup="meetup"></edit-meetup-date>
-              <edit-meetup-time :meetup="meetup"></edit-meetup-time>
+            <div class="card-text">
+              <h6 class="info--text" fullWidth>{{meetup.date | date}} - {{meetup.location}}</h6>
+              <v-spacer></v-spacer>
+              <div v-if="userIsCreator" class="templ">
+                <edit-meetup-date :meetup="meetup"></edit-meetup-date>
+                <edit-meetup-time :meetup="meetup"></edit-meetup-time>
+              </div>
             </div>
-            <div>{{meetup.description}}</div>
+            <div class="description">{{meetup.description}}</div>
           </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
             <register-meetup :meetupId="meetup.id" v-if="!userIsCreator && userIsAuthenticated"></register-meetup>
           </v-card-actions>
         </v-card>
@@ -69,5 +71,16 @@
 </script>
 
 <style scoped>
-
+  .description{
+    text-indent: 5px;
+    font-size:16px;
+  }
+  .card-text {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  .templ {
+    display: flex;
+  }
 </style>

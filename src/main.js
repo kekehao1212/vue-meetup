@@ -11,6 +11,7 @@ import EditMeetupDetailsDialog from './components/Meetup/Edit/EditMeetupDetailsD
 import EditMeetupDateDialog from './components/Meetup/Edit/EditMeetupDateDialog.vue'
 import EditMeetupTimeDialog from './components/Meetup/Edit/EditMeetupTimeDialog.vue'
 import RegisterDialog from './components/Meetup/Registration/RegisterDialog.vue'
+import footer from './components/shared/footer.vue'
 
 Vue.use(Vuetify)
 Vue.config.productionTip = false
@@ -20,7 +21,7 @@ Vue.component('edit-meetup-detail', EditMeetupDetailsDialog)
 Vue.component('edit-meetup-date', EditMeetupDateDialog)
 Vue.component('edit-meetup-time', EditMeetupTimeDialog)
 Vue.component('register-meetup', RegisterDialog)
-
+Vue.component('app-footer', footer)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

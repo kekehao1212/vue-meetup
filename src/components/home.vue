@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <v-container >
     <v-layout row wrap>
-      <v-flex xs12  sm6 md3 offset-md3 class="text-sm-right text-xs-center text-md-right">
+      <v-flex xs12 sm6 md3 offset-md3 class="text-sm-right text-xs-center text-md-right">
         <v-btn
           large
           class="primary"
@@ -30,7 +30,7 @@
       </v-flex>
     </v-layout>
     <v-layout row wrap v-if="!loading">
-      <v-flex xs12 md10 offset-md1>
+      <v-flex xs12 md12>
         <template>
           <v-carousel style="cursor : pointer" class="mt-4">
             <v-carousel-item
