@@ -39,6 +39,15 @@
           <v-card-actions>
             <register-meetup :meetupId="meetup.id" v-if="!userIsCreator && userIsAuthenticated"></register-meetup>
           </v-card-actions>
+          <template>
+            <v-layout>
+              <v-flex>
+                <v-btn flat icon @click="addFavorite">
+                  <v-icon :class="isFavorite">favorite</v-icon>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </template>
         </v-card>
       </v-flex>
     </v-layout>
@@ -56,6 +65,9 @@
       userIsAuthenticated () {
         return this.$store.getters.user !== undefined && this.$store.getters.user !== null
       },
+      userFavorited () {
+        return false
+      },
       userIsCreator () {
         if (!this.userIsAuthenticated) {
           return false
@@ -65,12 +77,25 @@
       },
       loading () {
         return this.$store.getters.loading
+      },
+      isFavorite () {
+        return this.userFavorited ? 'red--text' : 'grey--text'
+      }
+    },
+    methods: {
+      addFavorite () {
+
       }
     }
   }
 </script>
 
 <style scoped>
+  @import '../../mdi/css/materialdesignicons.min.css';
+  .favorie_btn {
+    display: flex;
+    flex-direction: column;
+  }
   .description{
     text-indent: 5px;
     font-size:16px;

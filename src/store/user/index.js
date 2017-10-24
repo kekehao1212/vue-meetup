@@ -26,6 +26,9 @@ export default {
     }
   },
   actions: {
+    changeUserFavoriteMeetup ({commit}, payload) {
+      wilddog.sync()
+    },
     registerUserForMeetup ({commit, getters}, payload) {
       commit('setLoading', true)
       const user = getters.user
