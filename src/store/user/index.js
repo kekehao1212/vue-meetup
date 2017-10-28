@@ -1,5 +1,5 @@
-
 import * as wilddog from 'wilddog'
+import router from '../../router'
 
 export default {
   state: {
@@ -26,8 +26,31 @@ export default {
     }
   },
   actions: {
-    changeUserFavoriteMeetup ({commit}, payload) {
-      wilddog.sync()
+    changeUserFavors ({commit, getters}, payload) {
+      if (getters.user == null) {
+        router.push('/Signin')
+        return
+      }
+      console.log(payload)
+      let favors = getters.user.favors
+      let updateUser = getters.user
+      console.log(updateUser)
+      if (payload.isFavorite) {
+        favors.push(payload.meetupId)
+      } else {
+        favors.splice(favors.findIndex((item) => {
+          return item === payload.meetupId
+        }), 1)
+      }
+      wilddog.sync().ref('/users/' + getters.user.id + '/favors').set(favors)
+        .then((data) => {
+          updateUser.favors = favors
+          commit('setUser', updateUser)
+        })
+        .catch((error) => {
+          commit('setError', error)
+          console.log('error')
+        })
     },
     registerUserForMeetup ({commit, getters}, payload) {
       commit('setLoading', true)
@@ -88,7 +111,8 @@ export default {
             }
             commit('setUser', newUser)
             commit('setLoading', false)
-          }).catch((error) => {
+          })
+          .catch((error) => {
             console.log(error)
             commit('setLoading', false)
             commit('setError', error)
@@ -131,24 +155,52 @@ export default {
       }
     },
     autoSignIn ({commit}, payload) {
-      commit('setUser', { id: payload.uid, registeredMeetups: [], wdkeys: {} })
+      commit('setUser', {id: payload.uid, registeredMeetups: [], wdkeys: {}})
     },
-    fetchUserData ({commit, getters}) {
-      console.log('fetch' + '/users/' + getters.user.id)
+    favorsToArray ({commit, getters}, payload) {
+      let favors = []
+      for (let key in payload) {
+        favors.push(payload[key])
+      }
+      wilddog.sync().ref('/users/' + getters.user.id + '/favors').set(favors)
+        .then((data) => {
+          console.log('success')
+        })
+        .catch((error) => {
+          console.log('error')
+          console.log(error)
+        })
+      return favors
+    },
+    fetchUserData ({commit, getters, dispatch}) {
       commit('setLoading', true)
-      wilddog.sync().ref('/users/' + getters.user.id + '/registrations/').once('value')
+      wilddog.sync().ref('/users/' + getters.user.id).once('value')
         .then(data => {
-          const values = data.val()
+          const registerValues = data.val()['registrations']
+          const favorsValues = data.val()['favors']
           let registeredMeetups = []
+          let favors = []
           let wdkeys = {}
-          for (let key in values) {
-            registeredMeetups.push(values[key])
-            wdkeys[values[key]] = key
+          if (Array.isArray(favorsValues) || !favorsValues) {
+            favors = favorsValues
+          } else {
+            dispatch('favorsToArray', favorsValues)
+              .then((data) => {
+                favors = data
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+          }
+          for (let key in registerValues) {
+            registeredMeetups.push(registerValues[key])
+            wdkeys[registerValues[key]] = key
           }
           const updateUser = {
             id: getters.user.id,
             registeredMeetups: registeredMeetups,
-            wdkeys: wdkeys
+            wdkeys: wdkeys,
+            favors: favors
           }
           commit('setUser', updateUser)
           commit('setLoading', false)

@@ -42,7 +42,7 @@
           <template>
             <v-layout>
               <v-flex>
-                <v-btn flat icon @click="addFavorite">
+                <v-btn flat icon @click="changeFavorite">
                   <v-icon :class="isFavorite">favorite</v-icon>
                 </v-btn>
               </v-flex>
@@ -58,15 +58,17 @@
 <script>
   export default {
     props: ['id'],
+    data () {
+      return {
+        userFavorited: false
+      }
+    },
     computed: {
       meetup () {
         return this.$store.getters.loadedMeetup(this.id)
       },
       userIsAuthenticated () {
         return this.$store.getters.user !== undefined && this.$store.getters.user !== null
-      },
-      userFavorited () {
-        return false
       },
       userIsCreator () {
         if (!this.userIsAuthenticated) {
@@ -83,8 +85,25 @@
       }
     },
     methods: {
-      addFavorite () {
-
+      changeFavorite () {
+        this.userFavorited = !this.userFavorited
+        this.$store.dispatch('changeUserFavors', {
+          meetupId: this.id,
+          isFavorite: this.userFavorited
+        })
+      }
+    },
+    created () {
+      if (!this.$store.getters.user || !this.$store.getters.user.hasOwnProperty('favors')) {
+        return
+      }
+      let favors = this.$store.getters.user.favors
+      if (favors.find((item) => {
+        return item === this.id
+      })) {
+        this.userFavorited = true
+      } else {
+        this.userFavorited = false
       }
     }
   }
@@ -92,19 +111,23 @@
 
 <style scoped>
   @import '../../mdi/css/materialdesignicons.min.css';
+
   .favorie_btn {
     display: flex;
     flex-direction: column;
   }
-  .description{
+
+  .description {
     text-indent: 5px;
-    font-size:16px;
+    font-size: 16px;
   }
+
   .card-text {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
   }
+
   .templ {
     display: flex;
   }
