@@ -3,7 +3,10 @@ import * as wilddog from 'wilddog'
 
 export default {
   state: {
-    loadedMeetups: []
+    loadedMeetups: [],
+    favors: [],
+    registeredMeetups: [],
+    createdMeetups: []
   },
   mutations: {
     loadMeetups (state, payload) {
@@ -25,6 +28,43 @@ export default {
       if (payload.date) {
         meetup.date = payload.date
       }
+    },
+    favors (state, payload) {
+      state.favors = payload
+    },
+    registeredMeetups (state, payload) {
+      state.registeredMeetups = payload
+    },
+    createdMeetups (state, payload) {
+      state.createdMeetups = payload
+    }
+  },
+  getters: {
+    loadedMeetups (state) {
+      return state.loadedMeetups.sort((meetupA, meetupB) => {
+        return meetupA.date > meetupB.date
+      })
+    },
+    loadedMeetup (state) {
+      return (meetupId) => {
+        return state.loadedMeetups.find((meetup) => {
+          return meetup.id === meetupId
+        })
+      }
+    },
+    featuredMeetups (state, getters) {
+      return state.loadedMeetups.sort((meetupA, meetupB) => {
+        return meetupA.date > meetupB.date
+      }).slice(0, 5)
+    },
+    favors (state) {
+      return state.favors
+    },
+    registeredMeetups (state) {
+      return state.registeredMeetups
+    },
+    createdMeetups (state) {
+      return state.createdMeetups
     }
   },
   actions: {
@@ -74,7 +114,7 @@ export default {
           commit('setLoading', false)
         })
     },
-    createMeetup ({commit, getters}, payload) {
+    createMeetup ({commit, getters, dispatch}, payload) {
       const meetup = {
         title: payload.title,
         location: payload.location,
@@ -83,6 +123,7 @@ export default {
         date: payload.date.toISOString(),
         creatorId: getters.user.id
       }
+      let createdMeetupId
       wilddog.sync().ref('meetups').push(meetup)
         .then((data) => {
           const key = data.key()
@@ -90,28 +131,35 @@ export default {
             ...meetup,
             id: key
           })
+          createdMeetupId = key
+          dispatch('createUserMeetup', createdMeetupId)
         }).catch((error) => {
           console.log(error)
         })
-    }
-  },
-  getters: {
-    loadedMeetups (state) {
-      return state.loadedMeetups.sort((meetupA, meetupB) => {
-        return meetupA.date > meetupB.date
-      })
     },
-    loadedMeetup (state) {
-      return (meetupId) => {
-        return state.loadedMeetups.find((meetup) => {
-          return meetup.id === meetupId
-        })
+    makeFavors ({commit, getters}) {
+      let favors = []
+      let favorsIndex = getters.user.favors
+      for (let index of favorsIndex) {
+        favors.push(getters.loadedMeetup(index))
       }
+      commit('favors', favors)
     },
-    featuredMeetups (state, getters) {
-      return state.loadedMeetups.sort((meetupA, meetupB) => {
-        return meetupA.date > meetupB.date
-      }).slice(0, 5)
+    makeRegistrations ({commit, getters}) {
+      let registeredMeetups = []
+      let registeredMeetupsIndex = getters.user.registeredMeetups
+      for (let index of registeredMeetupsIndex) {
+        registeredMeetups.push(getters.loadedMeetup(index))
+      }
+      commit('registeredMeetups', registeredMeetups)
+    },
+    makeCreatedMeetups ({commit, getters}) {
+      let createdMeetups = []
+      let createdMeetupsIndex = getters.user.createdMeetups
+      for (let index of createdMeetupsIndex) {
+        createdMeetups.push(getters.loadedMeetup(index))
+      }
+      commit('createdMeetups', createdMeetups)
     }
   }
 }

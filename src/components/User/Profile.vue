@@ -4,51 +4,113 @@
       <v-flex sm8 md8>
         <v-expansion-panel expand>
           <v-expansion-panel-content>
-            <div slot="header">My Registrations</div>
-            <v-card >
-              <v-card-title>
-                hello
+            <div slot="header"><v-icon>mdi-tag-face</v-icon>My Registrations</div>
+            <v-card v-for="item in registeredMeetups" :key="item.toString()">
+              <v-card-title class="red--text lighten-1  app_title">
+                {{item.title}}
                 </v-card-title>
-              <v-card-media :src=""></v-card-media>
-              <v-card-text class="grey lighten-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+              <v-card-media
+                :src="item.imageUrl"
+                height="200px"></v-card-media>
+              <v-card-text class="grey lighten-3">
+                  <v-layout column>
+                    <v-flex>
+                      <span class="grey--text darken-4">Time: </span>{{item.date | date}}
+                    </v-flex>
+                    <v-flex>
+                      <span class="grey--text darken-4">Location: </span>: {{item.location}}
+                    </v-flex>
+                    <v-flex>
+                      <span class="grey--text darken-4">description: </span>: {{item.description}}
+                    </v-flex>
+                  </v-layout>
+              </v-card-text>
             </v-card>
           </v-expansion-panel-content>
           <v-expansion-panel-content>
-            <div slot="header">My Favors</div>
-            <v-card>
-              <v-card-text class="grey lighten-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</v-card-text>
+            <div slot="header" ><v-icon>mdi-tag-heart</v-icon>My Favors</div>
+            <v-card v-for="item in favors" :key="item.toString()">
+              <v-card-title class="red--text lighten-1  app_title">
+                {{item.title}}
+              </v-card-title>
+              <v-card-media
+                :src="item.imageUrl"
+                height="300px"></v-card-media>
+              <v-card-text class="grey lighten-3">
+                <v-layout column>
+                  <v-flex>
+                    <span class="grey--text darken-4">Time: </span>{{item.date | date}}
+                  </v-flex>
+                  <v-flex>
+                    <span class="grey--text darken-4">Location: </span>: {{item.location}}
+                  </v-flex>
+                  <v-flex>
+                    <span class="grey--text darken-4">description: </span>: {{item.description}}
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+          <v-expansion-panel-content>
+            <div slot="header"><v-icon>mdi-led-on</v-icon>My CreatedMeetups</div>
+            <v-card v-for="item in createdMeetups" :key="item.toString()">
+              <v-card-title class="red--text lighten-1  app_title">
+                {{item.title}}
+              </v-card-title>
+              <v-card-media
+                :src="item.imageUrl"
+                height="200px"></v-card-media>
+              <v-card-text class="grey lighten-3">
+                <v-layout column>
+                  <v-flex>
+                    <span class="grey--text darken-4">Time: </span>{{item.date | date}}
+                  </v-flex>
+                  <v-flex>
+                    <span class="grey--text darken-4">Location: </span>: {{item.location}}
+                  </v-flex>
+                  <v-flex>
+                    <span class="grey--text darken-4">description: </span>: {{item.description}}
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-flex>
     </v-layout>
   </v-container>
-
 </template>
 
 <script>
   export default {
+    created () {
+      this.$store.dispatch('makeFavors')
+      this.$store.dispatch('makeRegistrations')
+      this.$store.dispatch('makeCreatedMeetups')
+    },
     data () {
+      return {}
     },
     computed: {
       favors () {
-        return this.$store.users.favors
+        return this.$store.getters.favors
       },
-      registrations () {
-        return this.$store.users.registrations
+      registeredMeetups () {
+        return this.$store.getters.registeredMeetups
+      },
+      createdMeetups () {
+        return this.$store.getters.createdMeetups
       }
     },
     method: {
-      favor (id) {
-        return this.$store.getters.loadedMeetup(this.id)
-      },
-      registration (id) {
-        return this.$store.getters.loadedMeetup(this.id)
-      }
     }
   }
 </script>
 
 <style scoped>
-
+.app_title{
+  font-size:20px;
+  text-align: center;
+  justify-content: center;
+}
 </style>

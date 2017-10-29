@@ -8,7 +8,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
     meetup: meetup,
-    user: user,
+    userInfo: user.userInfo,
+    userSign: user.userSign,
     shared: shared
   }
 })
